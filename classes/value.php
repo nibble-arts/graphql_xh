@@ -5,30 +5,67 @@ namespace data;
 class Value {
 
 	private $unique;
+	private $occ;
 	private $name;
 	private $values;
 	
+
 	// create value instance
+	// reset values array
+	// set occasions to 0 => no limit
 	public function __construct($name) {
 		$this->name = $name;
+
 		$this->values = [];
+		$this->occ = 0;
 	}
 	
 	// add single value/ array of values
+	// returns new count of values
+	// false if count after adding would be greater than max occ
 	public function add($value) {
 		
+		$ret = false;
+
+		// add multiple values by array
 		if (is_array($value)) {
-			array_merge($this->values, $value);
+
+			if (!$this->occ || (($this->count() + count($value)) <= $this->occ)) {
+				$this->values = array_merge($this->values, $value);
+				$ret = $this->count();
+			}
+
+			else {
+				$ret = false;
+			}
 		}
+
+		// add single value
 		else {
-			$this->values [] = $value;
+
+			if (!$this->occ || ($this->count() < $this->occ)) {
+				$this->values [] = $value;
+				$ret = $this->count();
+			}
+
+			else {
+				$ret = false;
+			}
 		}
+
+		// is unique value
+		// make values unique
+		if ($this->unique) {
+			$this->values = array_values(array_unique($this->values));
+		}
+
+		return $ret;
 	}
 	
 	// get value by key or values array
 	public function get ($index = false) {
 		
-		if ($index) {
+		if ($index !== false) {
 			if  (isset($this->values [$index])) {
 				return $this->values [$index];
 			}
@@ -40,10 +77,22 @@ class Value {
 		return $this->values;
 	}
 	
+	// set value unique
+	public function unique ($status) {
+		$this->unique = $status;
+	}
+
+	// set max occasions
+	public function occ ($count) {
+		$this->occ = $count;
+	}
+
 	// find value
 	// return index or false
 	// left, right truncation with asterisk
-	public function find ($value) {
+	// case = true > search case sensitive
+	// returns array with index and value
+	public function find ($value, $case = false) {
 		
 		$l = $r = false;
 		
@@ -57,28 +106,44 @@ class Value {
 			$value = substr($value, 0, strlen($value) - 1);
 		}
 		
-		//ToDo check for index
-		
+
+
+// ToDo check for index
+
+
+		// reset found results
+		$result = false;
+
 		foreach ($this->values as $idx => $val) {
 			
-			$ret = false;
-			$pos = strpos($val, $value);
+			// search case sensitive
+			if ($case !== false) {
+				$pos = strpos($val, $value);
+			}
+
+			// search case insensitive
+			else {
+				$pos = stripos($val, $value);
+			}
 			
 			// contains value
 			if ($pos !== false) {
 				
 				$end = $pos + strlen($value);
-				
+
+				// check with truncation
 				if ((($pos == 0 && !$l) || // not left truncated and at start
 					($pos >= 0 && $l)) && // left truncated
 					(($end == strlen($val) && !$r) || // not right truncated and at end
-					($end <= stelen($val) && $r))) { // right truncated
+					($end <= strlen($val) && $r))) { // right truncated
 				
-					return $idx;
+					// add result
+					$result[$idx] = $val;
 				}
 			}
+		}
 			
-			return false;
+		return $result;
 	}
 	
 	// get values count
