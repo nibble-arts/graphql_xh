@@ -1,3 +1,3 @@
 <?php
 
-$plugin_cf['data']['base_dir'] = "content/plugins/data/";
+$plugin_cf['data']['base_path'] = "content/plugins/data/";

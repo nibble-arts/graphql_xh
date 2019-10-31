@@ -10,5 +10,7 @@ class Main {
 		Config::init($config["data"]);
 		Text::init($text["data"]);
 
+		Data::init(Config::base_path());
+
 	}
 }

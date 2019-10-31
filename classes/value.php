@@ -1,13 +1,22 @@
 <?php
 
+
+/*
+ * CMSimple Data Plugin
+ * value class
+ */
+
 namespace data;
 
 class Value {
 
 	private $unique;
 	private $occ;
+	private $type;
 	private $name;
 	private $values;
+
+	// private $types = ["string", "date", "link"];
 	
 
 	// create value instance
@@ -20,6 +29,7 @@ class Value {
 		$this->occ = 0;
 	}
 	
+
 	// add single value/ array of values
 	// returns new count of values
 	// false if count after adding would be greater than max occ
@@ -27,31 +37,22 @@ class Value {
 		
 		$ret = false;
 
-		// add multiple values by array
-		if (is_array($value)) {
-
-			if (!$this->occ || (($this->count() + count($value)) <= $this->occ)) {
-				$this->values = array_merge($this->values, $value);
-				$ret = $this->count();
-			}
-
-			else {
-				$ret = false;
-			}
+		// make array of single index
+		if (!is_array($value)) {
+			$value = [$value];
 		}
 
-		// add single value
+
+		// add values if occurences are correct
+		if (!$this->occ || (($this->count() + count($value)) <= $this->occ)) {
+			$this->values = array_merge($this->values, $value);
+			$ret = $this->count();
+		}
+
 		else {
-
-			if (!$this->occ || ($this->count() < $this->occ)) {
-				$this->values [] = $value;
-				$ret = $this->count();
-			}
-
-			else {
-				$ret = false;
-			}
+			$ret = false;
 		}
+
 
 		// is unique value
 		// make values unique
@@ -62,6 +63,7 @@ class Value {
 		return $ret;
 	}
 	
+
 	// get value by key or values array
 	public function get ($index = false) {
 		
@@ -77,21 +79,71 @@ class Value {
 		return $this->values;
 	}
 	
+
+	// remove by index/index array
+	// returns number of removed indexes
+	// false, if key dont exist
+	public function remove_by_index($index) {
+
+		$cnt = 0;
+
+		// make array of single index
+		if (!is_array($index)) {
+			$index = [$index];
+		}
+
+		// iterate indexes
+		foreach ($index as $idx) {
+
+			// key exists -> remove value and reindex
+			if (isset($this->values [$idx])) {
+
+				unset($this->values [$idx]);
+				$cnt++;
+			}
+		}
+
+		// reindex values
+		$this->values = array_values($this->values);
+
+		return $cnt;
+	}
+
+
+	// remove by value
+	// left and right truncation with *
+	// default: find case insensitive
+	// case = true: case sensitive
+	public function remove_by_value($value, $case = false) {
+
+		$values = $this->find($value, $case);
+
+		return $this->remove_by_index(array_keys($values));
+	}
+
+
+	// set value type
+	public function type ($type) {
+		$this->type = $type;
+	}
+
+
 	// set value unique
 	public function unique ($status) {
 		$this->unique = $status;
 	}
+
 
 	// set max occasions
 	public function occ ($count) {
 		$this->occ = $count;
 	}
 
+
 	// find value
-	// return index or false
 	// left, right truncation with asterisk
 	// case = true > search case sensitive
-	// returns array with index and value
+	// returns array with index => value
 	public function find ($value, $case = false) {
 		
 		$l = $r = false;
@@ -112,10 +164,10 @@ class Value {
 
 
 		// reset found results
-		$result = false;
+		$result = [];
 
 		foreach ($this->values as $idx => $val) {
-			
+
 			// search case sensitive
 			if ($case !== false) {
 				$pos = strpos($val, $value);
@@ -142,9 +194,10 @@ class Value {
 				}
 			}
 		}
-			
+
 		return $result;
 	}
+
 	
 	// get values count
 	public function count () {
