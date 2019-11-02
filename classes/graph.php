@@ -5,19 +5,19 @@ namespace data;
 class Graph {
 
 	private $types;
+	private $default_types;
 
 	public function __construct($schema) {
 
+		$this->default_types = ["string", "int", "float", "bool", "date"];
 		$this->parse_types($schema);
 
-debug($this->types);
 	}
 
 
 	private function parse_types($types) {
 
 		foreach ($types as $name => $type) {
-// debug($type);
 			$this->types[$name] = new Type($name, $this->parse_type($type));
 		}
 	}
@@ -25,25 +25,27 @@ debug($this->types);
 
 	private function parse_type($type) {
 
-		foreach ($type as $name => $ref) {
+		$ret = [
+			"values" => [],
+			"types" => []
+		];
 
-// debug($name);
+		foreach ($type as $name => $type) {
+
+			// check for default types
+			if (in_array(strtolower($type), $this->default_types)) {
+				$ret["values"][$name] = $type;
+			}
+
+			else {
+				$ret["types"][$name] = $type;
+			}
+
 		}
 
-		return $type;
+		return $ret;
 	}
 
 }
 
-
-/*			$type_class = 'type_' . $name;
-
-			if (class_exists($type_class)) {
-
-				new $type_class();
-			}
-
-			else {
-				die ("class ".$type_class." does not exist");
-			}
-*/
+?>

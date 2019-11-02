@@ -23,10 +23,17 @@ class Value {
 	// reset values array
 	// set occasions to 0 => no limit
 	public function __construct($name) {
-		$this->name = $name;
 
+		$this->name = $name;
 		$this->values = [];
-		$this->occ = 0;
+
+		// check for occations
+		$this->occ = 1;
+
+		if (substr($name,0,1) == "[" && substr($name,-1,1) == "]") {
+			$this->occ = 0;
+			$this->name = substr($name, 1, -1);
+		}
 	}
 	
 

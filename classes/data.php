@@ -28,7 +28,7 @@ class Data {
 
 			self::$types = new Graph(parse_ini_file($path . "definition.ini", true));
 		}
-
+debug(self::$types);
 		// $files = scandir($path);
 
 		// foreach ($files as $file) {

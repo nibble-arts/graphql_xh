@@ -9,11 +9,13 @@ class Type {
 	private $values;
 	private $links;
 	
+	private $types;
 
 	// create type from ini file
-	public function __construct ($name, $structure, $uuid = false) {
+	public function __construct ($name, $schema, $uuid = false) {
 
 		$this->name = $name;
+
 
 		// set/create type id
 		if ($uuid === false) {
@@ -24,54 +26,16 @@ class Type {
 			$this->uuid = $uuid;
 		}
 
-		// parse structure
-		foreach ($structure as $name => $value) {
 
-			// if (!isset($value["type"])) {
-			// 	return false;
-			// }
+		// set values
+		foreach ($schema["values"] as $name => $type) {
+			$this->values[$name] = new Value($name);
+			$this->values[$name]->type($type);
+		}
 
-debug($value);
-
-			
-
-			switch($value["type"]) {
-
-				// add link to type
-				case "link":
-
-					// target is mandatory
-					if (!isset($value["target"])) {
-						return false;
-					}
-
-					// add new link class
-					$this->links[$name] = new Link($name, $value["target"]);
-					break;
-
-				// add simple value
-				default:
-
-					// add new value class
-					$new_val = new Value($name);
-
-					// set type
-					$new_val->type($value["type"]);
-
-					// set unique
-					if (isset($value["unique"])) {
-						$new_val->unique($value["unique"]);
-					}
-
-					// set occations
-					if (isset($value["occ"])) {
-						$new_val->occ($value["occ"]);
-					}
-
-					$this->values[$name] = $new_val;
-					break;
-
-			}
+		// set links
+		foreach ($schema["types"] as $name => $type) {
+			$this->links[$name] = new Link($name, $type);
 		}
 	}
 

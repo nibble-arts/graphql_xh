@@ -15,6 +15,14 @@ class Link {
 	public function __construct($name, $target) {
 
 		$this->target = $target;
+
+		// check for occations
+		$this->occ = 1;
+
+		if (substr($target,0,1) == "[" && substr($target,-1,1) == "]") {
+			$this->occ = 0;
+			$this->target = substr($target, 1, -1);
+		}
 	}
 
 
