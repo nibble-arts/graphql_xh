@@ -2,7 +2,7 @@
 
 namespace data;
 
-class Group {
+class Type {
 	
 	private $uuid;
 	private $name;
@@ -10,12 +10,12 @@ class Group {
 	private $links;
 	
 
-	// create group from ini file
+	// create type from ini file
 	public function __construct ($name, $structure, $uuid = false) {
 
 		$this->name = $name;
 
-		// set/create group id
+		// set/create type id
 		if ($uuid === false) {
 			$this->uuid = UUID::create();
 		}
@@ -27,13 +27,17 @@ class Group {
 		// parse structure
 		foreach ($structure as $name => $value) {
 
-			if (!isset($value["type"])) {
-				return false;
-			}
+			// if (!isset($value["type"])) {
+			// 	return false;
+			// }
+
+debug($value);
+
+			
 
 			switch($value["type"]) {
 
-				// add link to group
+				// add link to type
 				case "link":
 
 					// target is mandatory
@@ -141,7 +145,7 @@ class Group {
 	}
 
 
-	// get group as array
+	// get type as array
 	public function values() {
 
 		$ret = [];
@@ -154,7 +158,7 @@ class Group {
 	}
 
 
-	// get group as array
+	// get type as array
 	public function links() {
 
 		$ret = [];

@@ -31,11 +31,11 @@ class Link {
 
 			foreach ($links as $link) {
 
-				// link is data of related group
-				// add new group entry
+				// link is data of related type
+				// add new type entry
 				if (is_array($link) && $target) {
 
-					Data::add_to_group($target, $link);
+					Data::add_to_type($target, $link);
 					$this->links[$target][] = Data::last_id($target);
 				}
 

@@ -52,12 +52,12 @@ function data ($data_name = false, $query = false) {
 	];
 
 
-	data\Data::add_to_group("actor", $data);
-	$o .= data\Data::dump();
+	// data\Data::add_to_type("actor", $data);
+	// $o .= data\Data::dump();
 
 
 
-	data\Data::query($query);
+	// data\Data::query($query);
 
 
 

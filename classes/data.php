@@ -7,7 +7,7 @@ class Data {
 
 	private static $base_path;
 	private static $references;
-	private static $groups;
+	private static $types;
 	private static $last_id;
 
 
@@ -19,22 +19,27 @@ class Data {
 	}
 
 
-	// load group ini reference files
+	// load type ini reference files
 	public static function load($data_name) {
 
 		$path = self::$base_path . $data_name . "/";
 
-		$files = scandir($path);
+		if (file_exists($path . "definition.ini")) {
 
-		foreach ($files as $file) {
-
-			$name = pathinfo($file, PATHINFO_FILENAME);
-
-			if (pathinfo($file, PATHINFO_EXTENSION) == "ini") {
-
-				self::add_reference($name, parse_ini_file($path . $file, true));
-			}
+			self::$types = new Graph(parse_ini_file($path . "definition.ini", true));
 		}
+
+		// $files = scandir($path);
+
+		// foreach ($files as $file) {
+
+		// 	$name = pathinfo($file, PATHINFO_FILENAME);
+
+		// 	if (pathinfo($file, PATHINFO_EXTENSION) == "ini") {
+
+		// 		self::add_reference($name, parse_ini_file($path . $file, true));
+		// 	}
+		// }
 	}
 
 
@@ -51,43 +56,43 @@ class Data {
 	}
 
 
-	// add data to group
-	// if group doesnt exist, return false
+	// add data to type
+	// if type doesnt exist, return false
 	// optional uuid for existing data
 	// if false, create new uuid
-	public static function add_to_group($group_name, $data, $uuid = false) {
+	public static function add_to_type($type_name, $data, $uuid = false) {
 
-		$ref = self::get_reference($group_name);
+		$ref = self::get_reference($type_name);
 
 		if ($ref) {
 
-			$new_group = new Group($group_name, $ref, $uuid);
-			$uuid = $new_group->uuid();
+			$new_type = new Type($type_name, $ref, $uuid);
+			$uuid = $new_type->uuid();
 
-			$new_group->add($data, $uuid);
+			$new_type->add($data, $uuid);
 
-			self::$groups[$group_name][$uuid] = $new_group;
-			self::$last_id[$group_name] = $uuid;
+			self::$types[$type_name][$uuid] = $new_type;
+			self::$last_id[$type_name] = $uuid;
 		}
 	}
 
 
-	// get group by name [,id]
-	// if id = false > return array of groups
-	// return group with id
-	public static function get_group($group, $idx = false) {
+	// get type by name [,id]
+	// if id = false > return array of types
+	// return type with id
+	public static function get_type($type, $idx = false) {
 
 		if ($idx !== false) {
 
-			if (isset(self::$groups[$group][$idx])) {
-				return self::$groups[$group][$idx];
+			if (isset(self::$types[$type][$idx])) {
+				return self::$types[$type][$idx];
 			}
 		}
 
 		else {
 
-			if (isset(self::$groups[$group])) {
-				return self::$groups[$group];
+			if (isset(self::$types[$type])) {
+				return self::$types[$type];
 			}
 		}
 
@@ -95,7 +100,7 @@ class Data {
 	}
 
 
-	// get group reference by name if exists
+	// get type reference by name if exists
 	// else, return false
 	public static function get_reference($name) {
 
@@ -107,7 +112,7 @@ class Data {
 	}
 
 
-	// get last insert id from group
+	// get last insert id from type
 	// if empty, returns false
 	public static function last_id($name) {
 
@@ -119,8 +124,8 @@ class Data {
 	}
 
 
-	// get list of groups
-	public static function get_group_list() {
+	// get list of types
+	public static function get_type_list() {
 		return array_keys(self::$references);
 	}
 
@@ -131,15 +136,15 @@ class Data {
 
 		$ret .= '<table>';
 
-		foreach (self::get_group_list() as $name) {
+		foreach (self::get_type_list() as $name) {
 
 			$ret .= '<tr colspan="3"><th>' . $name . '</th></tr>';
 
-			$groups = self::get_group($name);
+			$types = self::get_type($name);
 
 			$curr_uuid = 0;
 
-			foreach ($groups as $uuid => $entry) {
+			foreach ($types as $uuid => $entry) {
 
 				foreach ($entry->values() as $key => $value) {
 
