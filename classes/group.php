@@ -4,16 +4,27 @@ namespace data;
 
 class Group {
 	
+	private $uuid;
 	private $name;
 	private $values;
 	private $links;
 	
 
 	// create group from ini file
-	public function __construct ($name, $structure) {
+	public function __construct ($name, $structure, $uuid = false) {
 
 		$this->name = $name;
 
+		// set/create group id
+		if ($uuid === false) {
+			$this->uuid = UUID::create();
+		}
+
+		else {
+			$this->uuid = $uuid;
+		}
+
+		// parse structure
 		foreach ($structure as $name => $value) {
 
 			if (!isset($value["type"])) {
@@ -57,6 +68,19 @@ class Group {
 					break;
 
 			}
+		}
+	}
+
+
+	// get/set uuis
+	public function uuid($uuid = false) {
+
+		if ($uuid !== false) {
+			$this->uuid = $uuid;
+		}
+
+		else {
+			return $this->uuid;
 		}
 	}
 
@@ -118,12 +142,28 @@ class Group {
 
 
 	// get group as array
-	public function get() {
+	public function values() {
 
 		$ret = [];
 
 		foreach ($this->values as $key => $value) {
 			$ret[$key] = $value->get();
+		}
+
+		return $ret;
+	}
+
+
+	// get group as array
+	public function links() {
+
+		$ret = [];
+
+		if ($this->links) {
+			
+			foreach ($this->links as $key => $value) {
+				$ret[$key] = $value->get();
+			}
 		}
 
 		return $ret;

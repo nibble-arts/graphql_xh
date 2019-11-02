@@ -8,6 +8,7 @@ class Link {
 	private $unique;
 	private $occ;
 	private $target;
+	private $links;
 
 
 	// create target
@@ -20,7 +21,7 @@ class Link {
 	// add link
 	public function add($target, $links) {
 
-	// make array of single ink
+	// make array of single link
 		if (!is_array($links)) {
 			$links = [$links];
 		}
@@ -28,12 +29,11 @@ class Link {
 		// add values if occurences are correct
 		if (!$this->occ || (($this->count() + count($links)) <= $this->occ)) {
 
-
-			foreach ($links as $key => $link) {
+			foreach ($links as $link) {
 
 				// link is data of related group
 				// add new group entry
-				if (is_array($link)) {
+				if (is_array($link) && $target) {
 
 					Data::add_to_group($target, $link);
 					$this->links[$target][] = Data::last_id($target);
@@ -41,7 +41,7 @@ class Link {
 
 				// add link
 				else {
-					$this->links[] = $link;
+					$this->links[$target][] = $link;
 				}
 			}
 
@@ -55,6 +55,24 @@ class Link {
 		return $ret;
 
 	}
+
+
+	// get link by key or links array
+	public function get ($index = false) {
+
+		if ($index !== false) {
+			if  (isset($this->links [$index])) {
+				return $this->links [$index];
+			}
+			else {
+				return false;
+			}
+		}
+		
+		return $this->links;
+	}
+	
+
 
 
 	// get/set target
