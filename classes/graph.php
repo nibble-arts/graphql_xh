@@ -42,7 +42,7 @@ class Graph {
 			}
 
 		}
-
+debug($ret);
 		return $ret;
 	}
 
