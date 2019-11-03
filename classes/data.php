@@ -7,7 +7,7 @@ class Data {
 
 	private static $base_path;
 	private static $references;
-	private static $types;
+	private static $schema;
 	private static $last_id;
 
 
@@ -24,11 +24,9 @@ class Data {
 
 		$path = self::$base_path . $data_name . "/";
 
-		if (file_exists($path . "definition.ini")) {
+		self::$schema = new Graph($path . "query.gql");
 
-			self::$types = new Graph(parse_ini_file($path . "definition.ini", true));
-		}
-debug(self::$types);
+debug(self::$schema);
 		// $files = scandir($path);
 
 		// foreach ($files as $file) {

@@ -7,45 +7,64 @@ class Graph {
 	private $types;
 	private $default_types;
 
-	public function __construct($schema) {
+	public function __construct($path) {
 
-		$this->default_types = ["string", "int", "float", "bool", "date"];
-		$this->parse_types($schema);
-
-	}
-
-
-	private function parse_types($types) {
-
-		foreach ($types as $name => $type) {
-			$this->types[$name] = new Type($name, $this->parse_type($type));
+		if (file_exists($path)) {
+			$schema = file_get_contents($path);
 		}
+
+
+		$sections = $this->parse_schema($schema);
+
+debug($sections);
+// new types\ID();
+
+		// $this->default_types = ["int", "float", "string", "bloolean", "id"];
+		// $this->parse_types($schema);
+
 	}
 
 
-	private function parse_type($type) {
+	private function parse_schema($schema, $ret_array = false) {
 
-		$ret = [
-			"values" => [],
-			"types" => []
-		];
+echo "<hr>";
+debug($schema);
+		$sections = $this->extract_section($schema);
 
-		foreach ($type as $name => $type) {
+		if ($sections) {
 
-			// check for default types
-			if (in_array(strtolower($type), $this->default_types)) {
-				$ret["values"][$name] = $type;
+			foreach ($sections as $part) {
+debug("recursion");
+// debug($part);
+				$ret_array = [$this->parse_schema($part)];
+// debug($ret);
 			}
 
-			else {
-				$ret["types"][$name] = $type;
-			}
+debug("return");
+debug($part);
+debug($ret_array);
 
 		}
-debug($ret);
-		return $ret;
+		else {
+			$ret_array = [$schema];
+		}
+
+
+		return $ret_array;
 	}
 
+
+
+	private function extract_section($string) {
+
+		preg_match_all('/\{((?:[^{}]++|(?R))*)}/', $string, $matches );
+
+		if (count($matches)) {
+			return $matches[1];
+		}
+
+		return false;
+	}
 }
 
 ?>
