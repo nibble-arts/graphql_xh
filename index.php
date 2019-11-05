@@ -26,8 +26,6 @@ function data ($data_name = false, $query = false) {
 	data\Data::load($data_name);
 
 
-
-
 	// $data = [
 	// 	"forename" => "Thomas",
 	// 	"name" => "Winkler",

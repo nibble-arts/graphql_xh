@@ -28,26 +28,32 @@ debug($sections);
 	private function parse_schema($schema, $ret_array = false) {
 
 echo "<hr>";
-debug($schema);
+// debug($schema);
 		$sections = $this->extract_section($schema);
 
 		if ($sections) {
 
 			foreach ($sections as $part) {
-debug("recursion");
-// debug($part);
-				$ret_array = [$this->parse_schema($part)];
-// debug($ret);
+
+debug($part);
+debug($schema);
+debug("pos: ".strpos($schema, $part));
+debug("length: ".strlen($part));
+
+// debug("recursion");
+// // debug($part);
+// 				$ret_array = [$this->parse_schema($part)];
+// // debug($ret);
 			}
 
-debug("return");
-debug($part);
-debug($ret_array);
+// debug("return");
+// debug($part);
+// debug($ret_array);
 
 		}
-		else {
-			$ret_array = [$schema];
-		}
+// 		else {
+// 			$ret_array = [$schema];
+// 		}
 
 
 		return $ret_array;
@@ -60,6 +66,7 @@ debug($ret_array);
 		preg_match_all('/\{((?:[^{}]++|(?R))*)}/', $string, $matches );
 
 		if (count($matches)) {
+
 			return $matches[1];
 		}
 
