@@ -16,7 +16,7 @@ class Graph {
 
 		$sections = $this->parse_schema($schema);
 
-debug($sections);
+// debug($sections);
 // new types\ID();
 
 		// $this->default_types = ["int", "float", "string", "bloolean", "id"];
@@ -25,49 +25,62 @@ debug($sections);
 	}
 
 
-	private function parse_schema($schema, $ret_array = false) {
+	private function parse_schema($schema) {
 
 echo "<hr>";
-// debug($schema);
+debug($schema);
+		$ret_array = [];
+
 		$sections = $this->extract_section($schema);
 
+debug($sections);
+
+		// sections found
 		if ($sections) {
 
 			foreach ($sections as $part) {
-
 debug($part);
-debug($schema);
-debug("pos: ".strpos($schema, $part));
-debug("length: ".strlen($part));
 
-// debug("recursion");
-// // debug($part);
-// 				$ret_array = [$this->parse_schema($part)];
-// // debug($ret);
+				// $ret_array[] = $this->parse_child($part);
 			}
-
-// debug("return");
-// debug($part);
-// debug($ret_array);
-
 		}
-// 		else {
-// 			$ret_array = [$schema];
-// 		}
-
 
 		return $ret_array;
 	}
 
 
+	// parse child section recursively
+	private function parse_child($child) {
+
+		if (count($child["child"])) {
+
+			$temp["before"] = $child["before"];
+			$temp["child"] = $this->parse_schema($child["child"]);
+			$temp["after"] = $child["after"];
+		}
+
+		return $temp;
+	}
+
 
 	private function extract_section($string) {
 
-		preg_match_all('/\{((?:[^{}]++|(?R))*)}/', $string, $matches );
+		$ret = [];
+
+		preg_match_all('/\{((?:[^{}]++|(?R))*)}/', $string, $matches, PREG_OFFSET_CAPTURE);
 
 		if (count($matches)) {
 
-			return $matches[1];
+			foreach ($matches[1] as $hit) {
+
+				$temp["before"] = substr($string, 0, $hit[0]);
+				$temp["child"] = $hit[0];
+				$temp["after"] = substr($string, $hit[1] + strlen($hit[0])+1);
+
+				$ret[] = $temp;
+			}
+
+			return $ret;
 		}
 
 		return false;
