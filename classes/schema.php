@@ -1,16 +1,28 @@
 <?php
 
+/*
+ * GraphQL schema parser
+ * @Author: Thomas Winkler
+ * @Copyright: 2019
+ */
+
 namespace data;
 
-class Graph {
+class Schema {
 
-	private $types;
+	private $schema;
 	private $default_types;
 
 	public function __construct($path) {
 
+		// load from path
 		if (file_exists($path)) {
 			$schema = file_get_contents($path);
+		}
+
+		// load from file
+		else {
+			$schema = $path;
 		}
 
 		$sections = $this->parse_schema($schema);
@@ -24,15 +36,9 @@ class Graph {
 	// parse schema
 	private function parse_schema ($schema) {
 
-		$sections = $this->parse_sections($schema);
+		$this->schema = $this->parse_sections($schema);
 
-debug($sections);
-
-
-
-
-
-
+// debug($this->schema);
 	}
 
 
@@ -50,21 +56,30 @@ debug($sections);
 
 				switch (array_keys($part)[0]) {
 
-					case "content":
-						$lines = $this->split_lines($part["content"]);
+					case "type":
 
-						// get last content entry
-						// $last = array_pop($lines);
+						$lines = $this->split_lines($part["type"]);
+
+						// get last type entry
+						$last = end($lines);
 
 						if (count($lines)) {
-							$ret_array[] = ["content" => $lines];
+							$ret_array[$idx] = $lines;
 
+// 							debug(new Scalar($lines));
 						}
 						break;
 
 					case "child":
-					// debug("last field: ".$last["field"]);
-						$ret_array[] = ["child" => $this->parse_sections($part["child"])];
+
+						// get index of last type entry
+						$sub_idx = count($ret_array[$idx-1])-1;
+
+						// is not on root level
+						if ($sub_idx >= 0) {
+
+							$ret_array[$idx-1][$sub_idx]["children"] = $this->parse_sections($part["child"]);
+						}
 
 						$last = "";
 						break;
@@ -72,7 +87,7 @@ debug($sections);
 			}
 		}
 
-		// return content
+		// return type
 		else {
 			return $schema;
 		}
@@ -82,7 +97,7 @@ debug($sections);
 
 
 	// ************************************************
-	// find { } sections and return array of content and sections
+	// find { } sections and return array of type and sections
 	private function extract_sections($string) {
 
 		$ret = [];
@@ -96,7 +111,7 @@ debug($sections);
 			foreach ($matches[1] as $hit) {
 
 				if (($hit[1] - $cursor) > 0) {
-					$ret[] = ["content" => substr($string, $cursor, ($hit[1] - $cursor - 1))];
+					$ret[] = ["type" => substr($string, $cursor, ($hit[1] - $cursor - 1))];
 				}
 
 				$ret[] = ["child" => $hit[0]];
@@ -106,7 +121,7 @@ debug($sections);
 
 			// add rest
 			if ($cursor < (strlen($string))) {
-				$ret[] = ["content" => substr($string, $cursor)];
+				$ret[] = ["type" => substr($string, $cursor)];
 			}
 
 			return $ret;
@@ -122,14 +137,13 @@ debug($sections);
 
 		$ret = [];
 		$lines = explode("\n", $string);
+// $lines = preg_split('(/\n\ )/', $string);
 
 		foreach ($lines as $line) {
 
 			$line = trim($line);
 
 			if ($line != "") {
-
-// debug( $this->parse_line($line));
 
 				$ret[] = $this->parse_line($line);
 			}
@@ -147,7 +161,7 @@ debug($sections);
 		[$type, $string] = $this->get_type_string($line);
 
 		return [
-			"field" => $line,
+			"name" => $line,
 			"type" => $type,
 			"string" => $string,
 			"params" => $param
@@ -165,9 +179,9 @@ debug($sections);
 			$string = str_replace($matches[0], "", $string);
 
 			$params = $this->explode_param($matches[1]);
-		}
 
-		return $params;
+			return $params;
+		}
 	}
 
 

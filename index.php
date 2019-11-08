@@ -25,6 +25,26 @@ function data ($data_name = false, $query = false) {
 	// load data structure
 	data\Data::load($data_name);
 
+	data\Data::query("
+query {
+	Actor
+	{
+		id
+		name
+		forename
+		addresses
+		{
+			address
+			zip
+			city
+			land
+			{
+				name
+			}
+		}
+	}
+}
+");
 
 	// $data = [
 	// 	"forename" => "Thomas",

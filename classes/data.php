@@ -6,6 +6,7 @@ namespace data;
 class Data {
 
 	private static $base_path;
+	private static $path;
 	private static $references;
 	private static $schema;
 	private static $last_id;
@@ -19,32 +20,25 @@ class Data {
 	}
 
 
-	// load type ini reference files
+	// load schema file
 	public static function load($data_name) {
 
-		$path = self::$base_path . $data_name . "/";
+		self::$path = self::$base_path . $data_name . "/";
 
-		self::$schema = new Graph($path . "query.gql");
+		self::$schema = new Schema(self::$path . "schema.gql");
 
-debug(self::$schema);
-		// $files = scandir($path);
-
-		// foreach ($files as $file) {
-
-		// 	$name = pathinfo($file, PATHINFO_FILENAME);
-
-		// 	if (pathinfo($file, PATHINFO_EXTENSION) == "ini") {
-
-		// 		self::add_reference($name, parse_ini_file($path . $file, true));
-		// 	}
-		// }
+// debug(self::$schema);
 	}
 
 
 	// query data
 	public static function query($query) {
 
-		$q = new Query($query);
+		// create graphql schema from query
+		$q = new Schema($query);
+
+debug($q);
+		// $q = new Query($query);
 	}
 
 
