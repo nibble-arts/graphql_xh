@@ -27,7 +27,7 @@ class Data {
 
 		self::$schema = new Schema(self::$path . "schema.gql");
 
-// debug(self::$schema);
+debug(self::$schema);
 	}
 
 
@@ -37,7 +37,7 @@ class Data {
 		// create graphql schema from query
 		$q = new Schema($query);
 
-debug($q);
+// debug($q);
 		// $q = new Query($query);
 	}
 
