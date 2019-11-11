@@ -12,8 +12,20 @@ class Schema {
 
 	private $schema;
 	private $default_types;
+	private $schema_types;
 
-	public function __construct($path) {
+	// create schema object
+	// set base path
+	// optional: set type = schema (default), query, mutation, data
+	public function __construct($path, $type = false) {
+
+		$this->schema_types = ["schema", "query", "mutation", "data"];
+
+		// if no type, use first in types list as default
+		if (!$type) {
+			$type = $this->schema_types[0];
+		}
+		
 
 		// load from path
 		if (file_exists($path)) {
@@ -25,20 +37,17 @@ class Schema {
 			$schema = $path;
 		}
 
-		$sections = $this->parse_schema($schema);
-
-// new types\ID();
-
+		$sections = $this->parse_schema($schema, $type);
 	}
 
 
 	// ************************************************
 	// parse schema
-	private function parse_schema ($schema) {
+	private function parse_schema ($schema, $type) {
 
 		$this->schema = $this->parse_sections($schema);
-
-// debug($this->schema);
+		$this->schema = $this->parse_by_type($type);
+		
 	}
 
 
@@ -163,7 +172,7 @@ class Schema {
 		return [
 			"name" => $line,
 			"type" => $type,
-			"string" => $string,
+			"value" => $string,
 			"params" => $param
 		];
 	}
@@ -245,6 +254,22 @@ class Schema {
 
 		// no quotes
 		return false;
+	}
+
+
+	// ************************************************
+	// parse schema array by type
+	private function parse_by_type($type) {
+
+		if (in_array($type, $this->schema_types)) {
+
+			$class = "data\\type_parser_" . $type;
+
+			$schema = $class::parse($this->schema);
+
+		}
+
+		return $schema;
 	}	
 }
 

@@ -23,7 +23,7 @@ function data ($data_name = false, $query = false) {
 	$o = data\Text::plugin_name();
 
 	// load data structure
-	data\Data::load($data_name);
+	data\Data::activate($data_name);
 
 	data\Data::query("
 query {
@@ -45,6 +45,7 @@ query {
 	}
 }
 ");
+
 
 	// $data = [
 	// 	"forename" => "Thomas",

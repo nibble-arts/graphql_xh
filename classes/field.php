@@ -6,32 +6,28 @@ namespace data;
 class Field {
 
 	private $type;
-	private $field;
-	private $string;
+	private $name;
+	private $value;
 	private $params;
-	private $children;
 
 	public function __construct($data) {
 
 		// $this->type = $type;
-		$this->field = $data["field"];
-		$this->string = $data["string"];
+		$this->name = $data["name"];
+		$this->value = $data["value"];
 		$this->params = $data["params"];
-
-		$this->children = [];
 
 	}
 
 
-	// add child or array of children
-	public function add_children($children) {
+	public function name($name = false) {
 
-		if (is_array($children)) {
-			$this->children = array_merge($this->children, $children);
+		if (!$name) {
+			return $this->name;
 		}
 
 		else {
-			$this->children[] = $children;
+			$this->name = $name;
 		}
 	}
 }

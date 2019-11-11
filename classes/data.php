@@ -6,28 +6,41 @@ namespace data;
 class Data {
 
 	private static $base_path;
+	private static $type_data;
 	private static $path;
-	private static $references;
 	private static $schema;
-	private static $last_id;
+	// private static $references;
+	// private static $last_id;
 
 
 	// init data class at base path
 	public static function init($path) {
 
 		self::$base_path = $path;
-		self::$last_id = [];
+		self::$type_data = [];
+		// self::$last_id = [];
 	}
 
 
 	// load schema file
-	public static function load($data_name) {
+	public static function activate($data_name) {
 
 		self::$path = self::$base_path . $data_name . "/";
 
 		self::$schema = new Schema(self::$path . "schema.gql");
 
-debug(self::$schema);
+// debug(self::$schema);
+	}
+
+
+	// load type data
+	public static function load_type($type) {
+
+		$path = self::$path . $type . ".dat";
+
+		if (file_exists($path)) {
+			self::$type_data[$type] = file_get_contents($path);
+		}
 	}
 
 
@@ -35,14 +48,23 @@ debug(self::$schema);
 	public static function query($query) {
 
 		// create graphql schema from query
-		$q = new Schema($query);
+		$q = new Schema($query, "query");
+
+debug($q);
+
+
+debug(self::$type_data);
+
 
 // debug($q);
 		// $q = new Query($query);
 	}
 
 
-	// add reference
+
+
+
+/*	// add reference
 	public static function add_reference($name, $reference) {
 		self::$references[$name] = $reference;
 	}
@@ -180,5 +202,5 @@ debug(self::$schema);
 		$ret .= '</table>';
 
 		return $ret;
-	}
+	}*/
 }
