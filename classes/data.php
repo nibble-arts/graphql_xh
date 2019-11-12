@@ -27,20 +27,9 @@ class Data {
 
 		self::$path = self::$base_path . $data_name . "/";
 
-		self::$schema = new Schema(self::$path . "schema.gql");
+		self::$schema = Schema::load(self::$path . "schema.gql");
 
-// debug(self::$schema);
-	}
-
-
-	// load type data
-	public static function load_data($type) {
-
-		$path = self::$path . $type . ".dat";
-
-		if (file_exists($path)) {
-			self::$type_data[$type] = file_get_contents($path);
-		}
+debug(self::$schema);
 	}
 
 
@@ -48,7 +37,7 @@ class Data {
 	public static function query($query) {
 
 		// create graphql schema from query
-		$q = new Schema($query, "query");
+		$q = new InputParser($query, "query");
 
 		self::$schema->query($q);
 

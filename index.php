@@ -25,25 +25,25 @@ function data ($data_name = false, $query = false) {
 	// load data structure
 	data\Data::activate($data_name);
 
-	data\Data::query("
-query {
-	actor (id: 3)
-	{
-		name
-		forename
-		addresses
-		{
-			address
-			zip
-			city
-			land
-			{
-				name
-			}
-		}
-	}
-}
-");
+// 	data\Data::query("
+// query {
+// 	actor (id: 3)
+// 	{
+// 		name
+// 		forename
+// 		addresses
+// 		{
+// 			address
+// 			zip
+// 			city
+// 			land
+// 			{
+// 				name
+// 			}
+// 		}
+// 	}
+// }
+// ");
 
 
 	debug(data\Message::get());
