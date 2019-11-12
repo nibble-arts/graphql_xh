@@ -27,9 +27,8 @@ function data ($data_name = false, $query = false) {
 
 	data\Data::query("
 query {
-	Actor
+	actor (id: 3)
 	{
-		id
 		name
 		forename
 		addresses

@@ -42,6 +42,12 @@ class Schema {
 
 
 	// ************************************************
+	public function query($query) {
+// debug($query);
+	}
+
+
+	// ************************************************
 	// parse schema
 	private function parse_schema ($schema, $type) {
 

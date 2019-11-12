@@ -7,9 +7,11 @@ class Type_Parser_Query {
 	public static function parse($schema) {
 
 		$types = [];
-
+		$schema = $schema[0];
 		// iterate schema and add types
-		foreach ($schema as $type) {
+		foreach ($schema as $fields) {
+
+			self::parse_field($fields);
 
 			// $type_name = $type[0]["name"];
 			// $type_fields = $type[0]["children"][0];
@@ -27,5 +29,17 @@ class Type_Parser_Query {
 		}
 
 		return $schema;
+	}
+
+
+	private static function parse_field($fields) {
+		echo "<hr>";
+
+		foreach ($fields as $field) {
+
+debug($field);
+// debug($field["params"]);
+// debug($field["children"]);
+		}
 	}
 }
