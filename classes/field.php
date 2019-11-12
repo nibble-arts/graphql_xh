@@ -41,37 +41,50 @@ class Field {
 
 
 	// query field
-	public function find($string) {
+	// if case == true > find case sensitive
+	public function find($value, $case = false) {
 
-		$trunc = $this->get_trunc($string);
+		$trunc = $this->get_trunc($value);
 
-		foreach ($this->values as $idx => $value) {
+		// reset found results
+		$result = [];
 
-			$start = strpos($value, $string);
+		foreach ($this->values as $idx => $val) {
 
-			// hit
-			if ($start !== false) {
+			// search case sensitive
+			if ($case !== false) {
+				$pos = strpos($val, $value);
+			}
 
-				$end = $start + strlen($string) - 1;
-
-echo "<hr>";
-debug($string ." in ".$value);
-debug($trunc);
-debug("start: ".$start." end: ".$end.", string_len: ". strlen($string).", val_length: ".strlen($value));
-
-debug(($trunc[0] || (!$trunc[0] && $start == 0)) || (($trunc[1] || (!$trunc[1] && $end == strlen($value)))));
-
-				if (($trunc[0] || (!$trunc[0] && $start == 0)) || (($trunc[1] || (!$trunc[1] && $end == (strlen($value) - 1))))) {
-					debug("found ".$string." in ".$idx);
-				}
+			// search case insensitive
+			else {
+				$pos = stripos($val, $value);
 			}
 
 
+			// contains value
+			if ($pos !== false) {
+
+				$end = $pos + strlen($value);
+
+				// check with truncation
+				if ((($pos == 0 && !$trunc[0]) || // not left truncated and at start
+					($pos >= 0 && $trunc[0])) && // left truncated
+					(($end == strlen($val) && !$trunc[1]) || // not right truncated and at end
+					($end <= strlen($val) && $trunc[1]))) { // right truncated
+				
+					// add result
+					$result[$idx] = $val;
+				}
+			}
+
+			// value is only wildcard > get all
+			elseif ($value == "*") {
+				$result[$idx] = $val;
+			}
 		}
-		// debug(array_search($string, $this->values));
 
-
-		// debug($this->values);
+		return $result;
 	}
 
 
@@ -150,7 +163,7 @@ debug(($trunc[0] || (!$trunc[0] && $start == 0)) || (($trunc[1] || (!$trunc[1] &
 		$left = false;
 		$right = false;
 
-		preg_match('/([*]?)([^*])([*]?)/', $string, $matches);
+		preg_match('/([*]?)([^*]+)([*]?)/', $string, $matches);
 
 		if (count($matches) > 3) {
 

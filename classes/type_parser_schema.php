@@ -22,16 +22,7 @@ class Type_Parser_Schema {
 
 			// add fields to type
 			foreach ($type_fields as $field) {
-
-				$f = new Field($field);
-
-				for($i=0;$i<10;$i++) {
-					$f->add("val".$i);
-				}
-
-				$f->find("0");
-
-				$type->add_field($f);
+				$type->add_field(new Field($field));
 			}
 
 			$types[$type->name()] = $type;
