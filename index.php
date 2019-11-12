@@ -47,6 +47,8 @@ query {
 ");
 
 
+	debug(data\Message::get());
+
 	// $data = [
 	// 	"forename" => "Thomas",
 	// 	"name" => "Winkler",

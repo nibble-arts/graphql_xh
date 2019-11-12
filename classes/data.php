@@ -29,12 +29,12 @@ class Data {
 
 		self::$schema = new Schema(self::$path . "schema.gql");
 
-// debug(self::$schema);
+debug(self::$schema);
 	}
 
 
 	// load type data
-	public static function load_type($type) {
+	public static function load_data($type) {
 
 		$path = self::$path . $type . ".dat";
 
@@ -50,10 +50,10 @@ class Data {
 		// create graphql schema from query
 		$q = new Schema($query, "query");
 
-debug($q);
+// debug($q);
 
 
-debug(self::$type_data);
+// debug(self::$type_data);
 
 
 // debug($q);
