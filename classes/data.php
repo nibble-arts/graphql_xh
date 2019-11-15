@@ -29,7 +29,7 @@ class Data {
 
 		self::$schema = Schema::load(self::$path . "schema.gql");
 
-debug(self::$schema);
+// debug(self::$schema);
 	}
 
 
@@ -37,9 +37,10 @@ debug(self::$schema);
 	public static function query($query) {
 
 		// create graphql schema from query
-		$q = new InputParser($query, "query");
+		$q = InputParser::parse($query);
 
-		self::$schema->query($q);
+debug($q);
+		// self::$schema->query($q);
 
 // debug(self::$type_data);
 

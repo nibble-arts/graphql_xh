@@ -33,7 +33,7 @@ class InputParser {
 
 	// ************************************************
 	// parse schema recursively
-	private static function parse_sections($schema) {
+	private static function parse_sections($schema, $level = 0) {
 
 		$ret_array = [];
 		$sections = self::extract_sections($schema);
@@ -43,35 +43,32 @@ class InputParser {
 
 			foreach ($sections as $idx => $part) {
 
-				switch (array_keys($part)[0]) {
+				if (isset($part["name"])) {
 
-					case "type":
+					$lines = self::split_lines($part["name"], $level);
 
-						$lines = self::split_lines($part["type"]);
+					// get last type entry
+					$last = end($lines);
 
-						// get last type entry
-						$last = end($lines);
+					if (count($lines)) {
+						$ret_array[$idx] = $lines;
+					}
+				}
 
-						if (count($lines)) {
-							$ret_array[$idx] = $lines;
 
-// 							debug(new Scalar($lines));
-						}
-						break;
+				// recursion
+				if (isset($part["child"])) {
 
-					case "child":
+					// get index of last type entry
+					$sub_idx = count($ret_array[$idx-1])-1;
 
-						// get index of last type entry
-						$sub_idx = count($ret_array[$idx-1])-1;
+					// is not on root level
+					if ($sub_idx >= 0) {
 
-						// is not on root level
-						if ($sub_idx >= 0) {
+						$ret_array[$idx-1][$sub_idx]["children"] = self::parse_sections($part["child"], $level  + 1);
+					}
 
-							$ret_array[$idx-1][$sub_idx]["children"] = self::parse_sections($part["child"]);
-						}
-
-						$last = "";
-						break;
+					$last = "";
 				}
 			}
 		}
@@ -102,42 +99,41 @@ class InputParser {
 				if (($hit[1] - $cursor) > 0) {
 
 					$name = substr($string, $cursor, ($hit[1] - $cursor - 1));
-					$type = self::parse_type_name($name);
 
-					$ret[] = ["type" => $name];
+					$ret[] = ["name" => trim($name)];
 				}
 
-				$ret[] = ["child" => $hit[0]];
+				$ret[] = ["child" => $hit[0], "type" => "children"];
 
 				$cursor = $hit[1] + strlen($hit[0]) + 1;
 			}
 
 			// add rest
 			if ($cursor < (strlen($string))) {
-				$ret[] = ["type" => substr($string, $cursor)];
+				$ret[] = ["name" => substr($string, $cursor)];
 			}
 
 			return $ret;
 		}
+
 		return false;
 	}
 
 
 	// ************************************************
 	// split string to trimmed lines
-	private static function split_lines($string) {
+	private static function split_lines($string, $level) {
 
 		$ret = [];
 		$lines = explode("\n", $string);
-// $lines = preg_split('(/\n\ )/', $string);
 
+		// iterate lines
 		foreach ($lines as $line) {
 
 			$line = trim($line);
 
 			if ($line != "") {
-
-				$ret[] = self::parse_line($line);
+				$ret[] = self::parse_line($line, $level);
 			}
 		}
 
@@ -147,15 +143,62 @@ class InputParser {
 
 	// ************************************************
 	// parse line
-	private static function parse_line($line) {
+	private static function parse_line($line, $level) {
+
+		$op = "";
+		$field = "";
+		$type = "";
+		$name = "";
+		$params = [];
+		
+		$line = trim($line);
 
 		$param = self::get_parameters($line);
-		[$type, $string] = self::get_type_string($line);
+
+		// test for field => type
+		$split = explode(":", $line);
+
+		if (count($split) > 1) {
+
+			$field = trim($split[0]);
+
+			if (self::is_quoted($split[1])) {
+				$name = trim($split[1]);
+			}
+			else {
+				$type = trim($split[1]);
+			}
+		}
+
+		// type => name
+		else {
+
+			$split = explode(" ", trim($line));
+
+			if (count($split) > 1) {
+				$op = trim($split[0]);
+				$name = trim($split[1]);
+			}
+
+			else {
+				// op on root level
+				if (!$level) {
+					$op = trim($line);
+				}
+
+				// field on sublevel
+				else {
+					$field = $line;
+				}
+			}
+		}
+
 
 		return [
-			"name" => $line,
+			"op" => $op,
+			"field" => $field,
 			"type" => $type,
-			// "value" => $string,
+			"name" => $name,
 			"params" => $param
 		];
 	}
@@ -198,31 +241,6 @@ class InputParser {
 
 
 	// ************************************************
-	// get quoted
-	private static function get_type_string(&$type_string) {
-
-		$type = "";
-		$string = "";
-
-		$field_type = explode(":", $type_string);
-
-		if (count($field_type) > 1) {
-
-			$type_string = trim($field_type[0]);
-
-			if (self::is_quoted($field_type[1])) {
-				$string = trim($field_type[1]);
-			}
-			else {
-				$type = trim($field_type[1]);
-			}
-		}
-
-		return [$type, $string];
-	}
-
-
-	// ************************************************
 	// checks if string is quoted
 	// false if no quotes
 	// string without quotes if true
@@ -237,25 +255,6 @@ class InputParser {
 
 		// no quotes
 		return false;
-	}
-
-
-	// parse type name
-	private static function parse_type_name(&$name) {
-
-		$ret = false;
-
-		$type_ary = array_filter(explode(" ", $name));
-
-		if (isset($type_ary[0])) {
-			$ret = trim($type_ary[0]);
-		}
-
-		if (isset($type_ary[1])) {
-			$name = trim($type_ary[1]);
-		}
-
-		return $ret;
 	}
 }
 

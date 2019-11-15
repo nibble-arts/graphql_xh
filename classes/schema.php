@@ -30,24 +30,24 @@ class Schema {
 
 	// parse input array
 	public static function parse($schema) {
-debug($schema);
+// debug($schema);
 		$types = [];
 
 		// iterate schema and add types
 		foreach ($schema as $type) {
 
-			$op_type = self::parse_type_name($type[0]["name"]);
+			// $op_type = self::parse_type_name($type[0]["name"]);
 
-			switch ($op_type["op"]) {
+			// switch ($op_type["op"]) {
 
-				case "schema":
-					self::$schema = new Type($type[0]["children"][0]);
-					break;
+			// 	case "schema":
+			// 		self::$schema = new Type($type[0]["children"][0]);
+			// 		break;
 
-				case "type":
-					self::$types[$op_type["type"]] = new Type($type[0]);
-					break;
-			}
+			// 	case "type":
+			// 		self::$types[$op_type["type"]] = new Type($type[0]);
+			// 		break;
+			// }
 
 
 			// $type_name = $type[0]["name"];
@@ -69,21 +69,27 @@ debug($schema);
 	}
 
 
-	// parse type name
-	private static function parse_type_name(&$name) {
-
-		$ret = ["op" => false, "type" => false];
-
-		$type_ary = array_filter(explode(" ", $name));
-
-		if (isset($type_ary[0])) {
-			$ret["op"] = $type_ary[0];
-		}
-
-		if (isset($type_ary[1])) {
-			$ret["type"] = $type_ary[1];
-		}
-
-		return $ret;
+	// query against schema
+	public static function query($query) {
+		
 	}
+
+
+	// parse type name
+	// private static function parse_type_name(&$name) {
+
+	// 	$ret = ["op" => false, "type" => false];
+
+	// 	$type_ary = array_filter(explode(" ", $name));
+
+	// 	if (isset($type_ary[0])) {
+	// 		$ret["op"] = $type_ary[0];
+	// 	}
+
+	// 	if (isset($type_ary[1])) {
+	// 		$ret["type"] = $type_ary[1];
+	// 	}
+
+	// 	return $ret;
+	// }
 }
