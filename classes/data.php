@@ -27,26 +27,20 @@ class Data {
 
 		self::$path = self::$base_path . $data_name . "/";
 
-		self::$schema = Schema::load(self::$path . "schema.gql");
+		Schema::load(self::$path . "schema.gql");
 
-// debug(self::$schema);
 	}
 
 
 	// query data
 	public static function query($query) {
 
-		// create graphql schema from query
-		$q = InputParser::parse($query);
-
-debug($q);
+debug(Schema::query($query));
 		// self::$schema->query($q);
 
 // debug(self::$type_data);
 
 
-// debug($q);
-		// $q = new Query($query);
 	}
 
 

@@ -21,57 +21,84 @@ class Schema {
 			$schema = $path;
 		}
 
-		$schema = InputParser::parse($schema);
-		$schema = self::parse($schema);
+		$schema = GraphQL::parse($schema);
+		self::parse($schema);
 
-		return $schema;
 	}
 
 
 	// parse input array
-	public static function parse($schema) {
-// debug($schema);
+	public static function parse($graphql) {
+
 		$types = [];
 
 		// iterate schema and add types
-		foreach ($schema as $type) {
+		foreach ($graphql as $type) {
 
-			// $op_type = self::parse_type_name($type[0]["name"]);
+			$type_obj = new Type($type[0]);
 
-			// switch ($op_type["op"]) {
+			switch ($type[0]["op"]) {
 
-			// 	case "schema":
-			// 		self::$schema = new Type($type[0]["children"][0]);
-			// 		break;
+				case "schema":
+					$type_obj->name($type[0]["op"]);
 
-			// 	case "type":
-			// 		self::$types[$op_type["type"]] = new Type($type[0]);
-			// 		break;
-			// }
+					self::$schema = $type_obj;
+					break;
 
-
-			// $type_name = $type[0]["name"];
-			// $type_fields = $type[0]["children"][0];
-
-			// $type = new Type($type_name);
+				case "type":
+					self::$types[$type_obj->name()] = $type_obj;
+					break;
+			}
+		}
+	}
 
 
-			// // add fields to type
-			// foreach ($type_fields as $field) {
-			// 	$type->add_field(new Field($field));
-			// }
+	// get schema
+	// return schema type
+	// if field = query || mutation > return corresponding field
+	public static function get_schema($field = false) {
 
-			// $types[$type->name()] = $type;
+		if ($field !== false) {
+			return self::$schema->get_field($field);
 		}
 
-// debug(self::$schema);
-// debug(self::$types);
+		return self::$schema;
+	}
+
+
+	// get type
+	public static function get_type($name) {
+
+		if (self::has_type($name)) {
+			return self::$types[$name];
+		}
+
+		return false;
+	}
+
+
+	// returns an list of types
+	public static function list_types() {
+
+		return array_keys(self::$types);
+	}
+
+
+	// true if type exists
+	// is case sensitive
+	public static function has_type($name) {
+
+		return isset(self::$types[$name]);
 	}
 
 
 	// query against schema
 	public static function query($query) {
 		
+		// create graphql schema from query
+		$q = GraphQL::parse($query);
+echo "<hr>";
+new Query($q[0]);
 	}
 
 

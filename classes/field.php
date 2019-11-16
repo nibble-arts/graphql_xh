@@ -7,23 +7,45 @@ class Field {
 
 	private $type;
 	private $name;
-	private $values;
 	private $params;
-	private $func;
+	private $values;
 
 
 	// construct field object
 	public function __construct($data) {
 
 		$this->values = [];
-		// $this->type = $type;
-		$this->type = $data["type"];
 
-		$this->func = $this->parse_type($this->type);
+		$this->type($data["type"]);
+		$this->name($data["field"]);
+		$this->params($data["params"]);
 
-		$this->name = $data["name"];
-		$this->params = $data["params"];
+	}
 
+
+	// set/get type
+	public function type($type = false) {
+
+		if (!$type) {
+			return $this->type;
+		}
+
+		else {
+			$this->type = $type;
+		}
+	}
+
+
+	// set/get parameters
+	public function params($params = false) {
+
+		if (!$params) {
+			return $this->params;
+		}
+
+		else {
+			$this->params = $params;
+		}
 	}
 
 

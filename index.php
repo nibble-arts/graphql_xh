@@ -26,8 +26,8 @@ function data ($data_name = false, $query = false) {
 	data\Data::activate($data_name);
 
 	data\Data::query('
-query {
-	actor (id: 3)
+query ActorById ($id: ID!) {
+	actor (id: $id, name: String)
 	{
 		name
 		forename
@@ -41,6 +41,15 @@ query {
 				name: "Österreich"
 			}
 		}
+		films
+		{
+			title
+		}
+	}
+	film (title: "*count*")
+	{
+		title
+		length
 	}
 }
 ');

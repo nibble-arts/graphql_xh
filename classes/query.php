@@ -14,7 +14,12 @@ class Query {
 
 
 	private function parse($query) {
-debug($query);
+
+		if ($query[0]["op"] == "query") {
+
+debug($query[0]["children"]);
+		}
+
 		return $query;
 	}
 }
