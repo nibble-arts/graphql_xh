@@ -14,41 +14,36 @@ namespace data;
 
 class GraphQL {
 
-	private $schema;
-	private $default_types;
-	private $schema_types;
-
-
-	public static function parse($schema) {
-
-		return self::parse_sections($schema);
-	}
-
 
 	// ************************************************
-	public static function query($query) {
-// debug($query);
+	// parse GraphQL string
+	public static function parse($schema) {
+		return self::parse_sections($schema);
 	}
 
 
 	// ************************************************
 	// parse schema recursively
 	private static function parse_sections($schema, $level = 0) {
+echo "<hr>";
+debug("parse level ".$level);
 
 		$ret_array = [];
 		$sections = self::extract_sections($schema);
 
 		// sections found
 		if ($sections) {
-
+debug($sections);
+// debug(count($sections));
 			foreach ($sections as $idx => $part) {
-
-				if (isset($part["name"])) {
+debug("level ".$level.", index ".$idx);
+debug($part);
+				if (isset($part["name"]) && trim($part["name"]) != "") {
 
 					$lines = self::split_lines($part["name"], $level);
 
 					// get last type entry
-					$last = end($lines);
+					// $last = end($lines);
 
 					if (count($lines)) {
 						$ret_array[$idx] = $lines;
@@ -56,6 +51,7 @@ class GraphQL {
 				}
 
 
+				// **************
 				// recursion
 				if (isset($part["child"])) {
 
@@ -64,8 +60,14 @@ class GraphQL {
 
 					// is not on root level
 					if ($sub_idx >= 0) {
+debug(">>> recursion");
+debug("index ".$idx.", subindex ".$sub_idx);
 
-						$ret_array[$idx-1][$sub_idx]["children"] = self::parse_sections($part["child"], $level  + 1);
+						$recurse_ary = self::parse_sections($part["child"], $level  + 1);
+						$ret_array[$idx-1][$sub_idx]["children"] = $recurse_ary;
+
+debug("<<< return from recursion to level ".$level);
+debug($recurse_ary);
 					}
 
 					$last = "";
@@ -77,7 +79,9 @@ class GraphQL {
 		else {
 			return $schema;
 		}
-
+debug("end cycle");
+echo "<hr>";
+// debug($ret_array);
 		return $ret_array;
 	}
 
@@ -94,13 +98,17 @@ class GraphQL {
 
 			$cursor = 0;
 
+			// iterate matches
 			foreach ($matches[1] as $hit) {
 
+				// position in string is valid
 				if (($hit[1] - $cursor) > 0) {
 
 					$name = substr($string, $cursor, ($hit[1] - $cursor - 1));
 
-					$ret[] = ["name" => trim($name)];
+					if (trim($name) != "") {
+						$ret[] = ["name" => trim($name)];
+					}
 				}
 
 				$ret[] = ["child" => $hit[0], "type" => "children"];

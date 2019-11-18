@@ -21,8 +21,8 @@ class Schema {
 			$schema = $path;
 		}
 
-		$schema = GraphQL::parse($schema);
-		self::parse($schema);
+		// $schema = GraphQL::parse($schema);
+		// self::parse($schema);
 
 	}
 
@@ -97,7 +97,7 @@ class Schema {
 		
 		// create graphql schema from query
 		$q = GraphQL::parse($query);
-echo "<hr>";
+
 new Query($q[0]);
 	}
 
